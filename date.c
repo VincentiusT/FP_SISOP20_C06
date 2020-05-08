@@ -87,6 +87,7 @@ void printFormat(char c){
   }
 }
 
+//date +
 void getDateByFormat(const char *format ,int length){
   for(int i=0;i<length;i++){
     if(format[i]=='%'){
@@ -103,8 +104,51 @@ void getDateByFormat(const char *format ,int length){
   }
 }
 
-void setDate(const char *str, int length){
-	
+//date -s
+void getDateByString(const char *format, int length){
+	struct rtcdate r;
+  	if(date(&r)){
+    	printf(2,"failed\n");
+    	exit();
+  	}
+	for(int i=0;i<length;i++){
+		if(format[i]=='m' && format[i+1]=='o' && format[i+2]=='n' && format[i+3]=='t' && format[i+4]=='h' ){
+			monthName(r.month);
+			i+=4;
+		}
+		else if(format[i]=='d' && format[i+1]=='a' && format[i+2]=='y'){
+			printf(1,"%d",r.day);
+			i+=2;
+		} 
+		else if(format[i]=='y' && format[i+1]=='e' && format[i+2]=='a' && format[i+3]=='r'){
+			printf(1,"%d",r.year);
+			i+=3;
+		}
+		else if(format[i]=='H' && format[i+1]=='H'){
+			int h = r.hour;
+			if(h<10) printf(1,"0%d",r.hour);
+			else printf(1,"%d",r.hour);
+			i++;
+		}
+		else if(format[i]=='M' && format[i+1]=='M'){
+			int m = r.minute;
+			if(m<10) printf(1,"0%d",r.minute);
+			else printf(1,"%d",r.minute);
+			i++;
+		}
+		else if(format[i]=='S' && format[i+1]=='S'){
+			int s = r.second;
+			if(s<10) printf(1,"0%d",r.second);
+			else printf(1,"%d",r.second);
+			i++;
+		}
+		else if(format[i]=='"' || format[i]=='-' ||format[i]=='s'){
+			continue;
+		}
+		else{
+			printf(1,"%c",format[i]);
+		}
+	}
 }
 
 void yesterday(){
@@ -236,6 +280,7 @@ void tomorrow(){
 	printf(1," %d\n",r.year);  
 }
 
+//date -d
 void getDate(const char * day){
   if(strcmp(day,"today")==0){
     currentDate();
@@ -251,7 +296,8 @@ void getDate(const char * day){
   }
 }
 
-void getCreationDate(const char *fileName, int length){
+//date -r
+void getModificationDate(const char *fileName, int length){
 	
 }
 
@@ -271,15 +317,15 @@ int main(int argc, char *argv[]){
       exit();
     }
 	if(temp[0]=='-' && temp[1]=='s'){
-		for(int i=1;i<argc;i++){
-        setDate(argv[i],strlen(argv[i]));
-        printf(1," ");
+	  for(int i=1;i<argc;i++){
+    	getDateByString(argv[i],strlen(argv[i]));
+    	printf(1," ");
       }
       printf(1,"\n");
       exit();
 	}
 	if(temp[0]=='-' && temp[1]=='r'){
-	  getCreationDate(argv[2],strlen(argv[2]));
+	  getModificationDate(argv[2],strlen(argv[2]));
 	  printf(1,"\n");
 	  exit();
 	}
@@ -290,3 +336,4 @@ int main(int argc, char *argv[]){
   }
   exit();
 }
+
